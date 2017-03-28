@@ -42,6 +42,9 @@ def string_includes(string, pattern)
   end
 end
 
+urls_bitcointalk = [                                                           \
+  'https://bitcointalk.org/index.php?type=atom;action=.xml;limit=255;sa=recent'\
+]
 urls_stackexchange = [
   'https://ethereum.stackexchange.com/feeds/tag'                               \
     + '?tagnames=parity+or+ethcore+or+kovan+or+parity-wallet&sort=newest',
@@ -92,6 +95,24 @@ items = Hash.new
 
 begin
   counted = 0
+
+
+  urls_bitcointalk.each do |url|
+    feed_bitcointalk = Feedjira::Feed.fetch_and_parse url
+    feed_bitcointalk.entries.each do |post|
+      if (
+           string_includes(post.title,   'parity')                             \
+        or string_includes(post.title,   'ethcore')                            \
+        or string_includes(post.summary, 'parity')                             \
+        or string_includes(post.summary, 'ethcore')                            \
+      )
+        items[post.updated.strftime("%Y%m%d%H%M%S").to_i]                      \
+          = " -1 BT  ".light_yellow + '%-64.64s' % post.title[0..63] + " "     \
+          + post.url.light_yellow
+      end
+    end
+  end
+
   urls_gitter.each do |room, url|
     feed_gitter = open_remote_json url
     feed_gitter.each do |message|
@@ -106,14 +127,14 @@ begin
     feed_stackexchange = Feedjira::Feed.fetch_and_parse url
     feed_stackexchange.entries.each do | question |
       if (                                                                     \
-        string_includes(question.title, 'parity')                              \
-        or string_includes(question.title, 'ethcore')                          \
+           string_includes(question.title,   'parity')                         \
+        or string_includes(question.title,   'ethcore')                        \
         or string_includes(question.summary, 'parity')                         \
         or string_includes(question.summary, 'ethcore')                        \
-        or question.categories.include? 'parity'                               \
-        or question.categories.include? 'ethcore'                              \
-        or question.categories.include? 'kovan'                                \
-        or question.categories.include? 'parity-wallet'                        \
+        or question.categories.include?      'parity'                          \
+        or question.categories.include?      'ethcore'                         \
+        or question.categories.include?      'kovan'                           \
+        or question.categories.include?      'parity-wallet'                   \
       )
         items[question.updated.strftime("%Y%m%d%H%M%S").to_i]                  \
           = "  1 SE  ".light_cyan + '%-64.64s' % question.title[0..63] + " "   \
@@ -125,10 +146,10 @@ begin
   feed_github = Feedjira::Feed.fetch_and_parse url_github
   feed_github.entries.each do | item |
     if ((                                                                      \
-      string_includes(item.url, "parity")                                      \
+         string_includes(item.url, "parity")                                   \
       or string_includes(item.url, "ethcore")                                  \
     ) and (                                                                    \
-      string_includes(item.url, "issue")                                       \
+         string_includes(item.url, "issue")                                    \
       or string_includes(item.url, "pull")                                     \
     ))
       items[item.updated.strftime("%Y%m%d%H%M%S").to_i] = "  2 GH  ".light_red \
@@ -147,8 +168,8 @@ begin
     feed_reddit = Feedjira::Feed.fetch_and_parse url
     feed_reddit.entries.each do | post |
       if (                                                                     \
-        string_includes(post.title, "parity")                                  \
-        or string_includes(post.title, "ethcore")                              \
+           string_includes(post.title,   "parity")                             \
+        or string_includes(post.title,   "ethcore")                            \
         or string_includes(post.content, "parity")                             \
         or string_includes(post.content, "ethcore")                            \
       )
@@ -163,8 +184,8 @@ begin
     feed_twitter = Feedjira::Feed.fetch_and_parse url
     feed_twitter.entries.each do | tweet |
       if (                                                                     \
-        string_includes(tweet.title, "parity")                                 \
-        or string_includes(tweet.title, "ethcore")                             \
+           string_includes(tweet.title,  "parity")                             \
+        or string_includes(tweet.title,  "ethcore")                            \
         or string_includes(tweet.author, "parity")                             \
         or string_includes(tweet.author, "ethcore")                            \
       )
