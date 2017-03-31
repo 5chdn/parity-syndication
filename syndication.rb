@@ -199,7 +199,7 @@ begin
   items = items.sort.to_h
   system 'clear'
   items.each do |k, i|
-    printf color_timestamp(k, 10000) + " " + i.gsub(/\n/, " ") + "\n"
+    printf color_timestamp(k, 20000) + " " + i.gsub(/\n/, " ") + "\n"
   end
   printf color_timestamp(Time.now.strftime("%Y%m%d%H%M%S").to_i, 0)            \
     + "         LAST UPDATE " + counted.to_s + " ITEMS\n"
