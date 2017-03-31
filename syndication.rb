@@ -13,10 +13,10 @@ def open_remote_json(url)
   JSON.parse content
 end
 
-def color_timestamp(time)
+def color_timestamp(time, zone_offset)
   now_i = Time.now.strftime("%Y%m%d%H%M%S").to_i
-  time_i = time
-  time = time.to_s
+  time_i = time + zone_offset
+  time = time_i.to_s
   if time_i + 1000000 > now_i
     time.light_green
   elsif time_i + 2000000 > now_i
@@ -178,9 +178,9 @@ begin
   items = items.sort.to_h
   system 'clear'
   items.each do |k, i|
-    printf color_timestamp(k) + " " + i.gsub(/\n/, " ") + "\n"
+    printf color_timestamp(k, 10000) + " " + i.gsub(/\n/, " ") + "\n"
   end
-  printf color_timestamp(Time.now.strftime("%Y%m%d%H%M%S").to_i)               \
+  printf color_timestamp(Time.now.strftime("%Y%m%d%H%M%S").to_i, 0)            \
     + "         LAST UPDATE " + counted.to_s + " ITEMS\n"
   sleep 900
 end while true
